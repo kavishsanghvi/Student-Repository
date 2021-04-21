@@ -34,10 +34,10 @@ class TestMainFunction(unittest.TestCase):
         """
 
         self.data()
-
         try:
-            self.assertEqual(list(self.university_data.student['10103'].courses.keys()), [
-                             'SSW 567', 'SSW 564', 'SSW 687', 'CS 501'], f'Invalid output.')
+            self.assertEqual(
+                self.university_data.student['10103'].remaining_required, [
+                    'SSW 540', 'SSW 555'], f'Invalid output.')
             print(f'Test Case 2. Test Case Passed')
         except AssertionError as e:
             print('Error: Test case 2 failed: ', e)
