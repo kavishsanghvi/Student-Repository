@@ -1,6 +1,7 @@
 from HW08_Kavish_Sanghvi import file_reader
 from prettytable import PrettyTable
 import os
+import sqlite3
 
 
 class Student:
@@ -109,9 +110,10 @@ class University:
         self.process_all_data()
         self.calculate_cgpa()
 
-    def process_all_data(self):
-        grades = file_reader(self.path + 'grades.txt', 4, '|', header=True)
 
+    def process_all_data(self):
+        grades = file_reader(self.path + 'grades.txt', 4, '\t', header=True)
+        
         for line in grades:
             try:
                 if len(line[0]) < 1:
@@ -177,10 +179,29 @@ class University:
             total = 0
             for courses, grade in value.courses.items():
                 total += self.get_grade_value(grade)
+            if len(list(value.courses.keys())) != 0:
+                cgpa = total / len(list(value.courses.keys()))
+                value.cgpa = round(cgpa, 2)
+            else:
+                value.cgpa = 0
 
-            cgpa = total / len(list(value.courses.keys()))
-            value.cgpa = round(cgpa, 2)
-
+    def student_grades_table_db(self, db_path) -> None:
+        db_file: str = db_path
+        db: sqlite3.Connection = sqlite3.connect(db_file)
+        query: str = "select students.Name, grades.StudentCWID, grades.Course, grades.Grade, instructors.Name from grades \
+                  JOIN students on grades.StudentCWID = students.CWID \
+                  JOIN instructors on grades.InstructorCWID = instructors.CWID \
+                  ORDER BY students.Name ASC"
+        
+        ans: list = []
+        for row in db.execute(query):
+            ans.append((row))
+            
+        db.commit()
+        db.close()
+        return ans
+                
+                       
     def display_and_save(self) -> None:
         ''' pretty print the data
 
@@ -190,6 +211,7 @@ class University:
         :rtype: None
         :return: None
         '''
+        
         x = PrettyTable()
         x.field_names = [
             'CWID',
@@ -211,7 +233,6 @@ class University:
 
         y = PrettyTable()
         y.field_names = ['CWID', 'Name', 'Dept', 'Course', 'Students']
-
         for k, l in self.instructor.items():
             for course, grade in l.courses.items():
                 row = []
@@ -221,16 +242,38 @@ class University:
 
         z = PrettyTable()
         z.field_names = ['Major', 'Required Courses', 'Electives']
-
+        
         for k, l in self.major.items():
             row = []
             values = [l.major, sorted(l.required_courses), sorted(l.electives)]
             row.extend(values)
             z.add_row(row)
 
+        l = PrettyTable()
+        l.field_names = ['Name', 'CWID', 'Course', 'Grade', 'Instructor']
+        students_grade_summary = self.student_grades_table_db('lab11.db')
+        for k in students_grade_summary:
+            row = []
+            values = [k[0], k[1], k[2], k[3], k[4]]
+            row.extend(values)
+            l.add_row(row)
+
+            
+        print('Students Summary')
         print(x)
+        print()
+        
+        print('Instructor Summary')
         print(y)
+        print()
+        
+        print('Majors Summary')
         print(z)
+        print()
+
+        print('Students Grade Summary')
+        print(l)
+        print()
 
         if not os.path.isdir(self.name):
             os.mkdir(self.name)
@@ -260,7 +303,7 @@ def main(uni_name, path=''):
     '''
     students_info: dict = {}
 
-    students = file_reader(path + 'students.txt', 3, ';', header=True)
+    students = file_reader(path + 'students.txt', 3, '\t', header=True)
 
     for line in students:
 
@@ -279,7 +322,7 @@ def main(uni_name, path=''):
 
     instructors_info: dict = {}
 
-    instructors = file_reader(path + 'instructors.txt', 3, '|', header=True)
+    instructors = file_reader(path + 'instructors.txt', 3, '\t', header=True)
 
     for line in instructors:
 
