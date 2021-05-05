@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table style="width:100%">
+  <tr>
+    <th>Student</th>
+    <th>CWID</th>
+    <th>Course</th>
+    <th>Course</th>
+    <th>Instructor</th>
+  </tr>
+    {% for row in ans %}
+    <tr>  
+    <td>{{row[0]}}</td>
+    <td>{{row[1]}}</td>
+    <td>{{row[2]}}</td>
+    <td>{{row[3]}}</td>
+    <td>{{row[4]}}</td>
+  </tr>
+   {% endfor %}
+</table>
+{% endblock %}
