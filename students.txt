@@ -1,5 +1,0 @@
-CWID	Name	Major
-10103	Jobs, S	SFEN
-10115	Bezos, J	SFEN
-10183	Musk, E	SFEN
-11714	Gates, B	CS

@@ -1,4 +1,0 @@
-CWID	Name	Dept
-98764	Cohen, R	SFEN
-98763	Rowland, J	SFEN
-98762	Hawking, S	CS
